@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "455737909200",
+    "project_id": "salarysoft-f8742",
+    "storage_bucket": "salarysoft-f8742.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455737909200:android:85220c87ae4ecf6d3ce3d5",
+        "android_client_info": {
+          "package_name": "com.example.salary_soft"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9G3xe9FLii52mnatXzQh2bsyp9-vS7CI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
