@@ -113,3 +113,19 @@
 //             ),
 //           ),
 //         ),
+
+
+// Future<void> fetchPositions() async {
+//   final DatabaseReference _database = FirebaseDatabase.instance.ref();
+//   _database.child("Employee_position").onValue.listen((event) {
+//     final positionsData = event.snapshot;
+//     List<String> loadedPositions = [];
+//
+//     for (var position in positionsData.children) {
+//       loadedPositions.add(position.child('position_name').value.toString());
+//     }
+//
+//     _position = loadedPositions;
+//     notifyListeners();
+//   });
+// }

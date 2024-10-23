@@ -200,6 +200,13 @@ class _dashBoardState extends State<dashBoard>  with SingleTickerProviderStateMi
           ),
         ],
       ),
+          floatingActionButton: FloatingActionButton(
+      onPressed: () {
+        logout();
+      },
+      child: const Icon(Icons.logout, color: Colors.white),
+      backgroundColor: Colors.blueAccent,
+    ),
     );
   }
 

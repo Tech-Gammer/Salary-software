@@ -4,15 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:salary_soft/Auth/loginPage.dart';
 import 'package:salary_soft/providers/adminprovider.dart';
 import 'package:salary_soft/providers/authprovider.dart';
-import 'package:salary_soft/providers/departmentprovider.dart';
 import 'package:salary_soft/providers/employee_providers.dart';
+import 'package:salary_soft/providers/position_provider.dart';
 import 'package:salary_soft/providers/shwoing_depart_provider.dart';
 import 'Departments_page/total_Departments.dart';
 import 'Empoyee_page/employee_Mainpage.dart';
 import 'Empoyee_page/resticated_Employees.dart';
 import 'Salary_page/salary_Mainpage.dart';
 import 'Salary_page/salarypages/Arabian.dart';
-import 'Salary_page/salarysheet.dart';
 import 'firebase_options.dart';
 import 'firstPage.dart';
 
@@ -30,9 +29,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => EmployeeProvider()), // Add EmployeeProvider here
         ChangeNotifierProvider(create: (_) => AdminProvider()), // Add EmployeeProvider here
         ChangeNotifierProvider(create: (_) => LoginProvider()),
-        ChangeNotifierProvider(create: (_) => DepartmentProvider()), // Provide DepartmentProvider
-
-
+        ChangeNotifierProvider(create: (_) => PositionsProvider()),
 
       ],
       child: const MyApp(),

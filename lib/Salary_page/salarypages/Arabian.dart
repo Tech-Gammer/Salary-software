@@ -38,37 +38,41 @@ class _arabianSalarysheetState extends State<arabianSalarysheet> {
                       fontSize: 25,
                       color: Colors.black,
                     ),),
-                    Table(
-                      border: TableBorder.all(),
-                      children: [
-                        TableRow(
-                          children: [
-                            tableCell('چھٹیاں'),
-                            tableCell('بقایا'),
-                            tableCell('اضافہ/کٹوتی'),
-                            tableCell('تنخواہ'),
-                            tableCell('نام'),
-                            tableCell('Joining Date'),
-                            // tableCell('Increment Date'),
-                            tableCell('نمبر شمار'),
-                          ],
-                        ),
-                        ...employees.entries.map((entry) {
-                          var emp = entry.value;
-                          return TableRow(
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Table(
+                        border: TableBorder.all(),
+                        children: [
+                          TableRow(
                             children: [
-                              tableCell(emp['deductions']?.toString() ?? '-'),  // Handle null
-                              tableCell(emp['punishment']?.toString() ?? '0'),  // Handle null
-                              tableCell(emp['extra_allowance']?.toString() ?? '-'),  // Handle null
-                              tableCell(emp['salary']?.toString() ?? '0'),  // Handle null
-                              tableCell(emp['name']?.toString() ?? 'نامعلوم'),  // Handle null
-                              tableCell(emp['joiningDate']?.toString() ?? 'نامعلوم'),  // Handle null
-                              // tableCell(emp['increment_date']?.toString() ?? 'نامعلوم'),  // Handle null
-                              tableCell(entry.key.toString()),
+                              tableCell('چھٹیاں'),
+                              tableCell('بقایا'),
+                              tableCell('اضافہ/کٹوتی'),
+                              tableCell('تنخواہ'),
+                              tableCell('نام'),
+                              // tableCell('Joining Date'),
+                              // tableCell('Increment Date'),
+                              tableCell('نمبر شمار'),
                             ],
-                          );
-                        }).toList(),
-                      ],
+                          ),
+                          ...employees.entries.toList().asMap().entries.map((entry) {
+                            int index = entry.key + 1; // Start numbering from 1
+                            var emp = entry.value.value; // Access the employee data
+                            return TableRow(
+                              children: [
+                                tableCell(emp['deductions']?.toString() ?? '-'),  // Handle null
+                                tableCell(emp['punishment']?.toString() ?? '0'),  // Handle null
+                                tableCell(emp['extra_allowance']?.toString() ?? '-'),  // Handle null
+                                tableCell(emp['salary']?.toString() ?? '0'),  // Handle null
+                                tableCell(emp['name']?.toString() ?? 'نامعلوم'),  // Handle null
+                                // tableCell(emp['joiningDate']?.toString() ?? 'نامعلوم'),  // Handle null
+                                // tableCell(emp['increment_date']?.toString() ?? 'نامعلوم'),  // Handle null
+                                tableCell(index.toString()), // Display the index number
+                              ],
+                            );
+                          }).toList(),
+                        ],
+                      ),
                     ),
                   ],
                 ),

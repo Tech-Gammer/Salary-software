@@ -26,7 +26,7 @@ class _addEmployState extends State<addEmploy> {
   TextEditingController _ageController = TextEditingController();
   TextEditingController _idcardController = TextEditingController();
   TextEditingController _referenceController = TextEditingController();
-  TextEditingController _positionController = TextEditingController();
+  // TextEditingController _positionController = TextEditingController();
   TextEditingController _salaryController = TextEditingController();
   TextEditingController _residenceController = TextEditingController();
 
@@ -36,13 +36,24 @@ class _addEmployState extends State<addEmploy> {
   String? role;
   bool issaving= false;
   List<String> Departments = [];
-  String department = "";
+  String? department;
+  List<Map<String, String>> Positions = []; // Modify to hold maps
+  String? position;  // Make sure it's nullable
 
 
 void saveEmployee() async{
   if (formKey.currentState!.validate()) {
     // Get the current user's ID
     User? user = FirebaseAuth.instance.currentUser;
+    String? positionName;
+    if (position != null && Positions.isNotEmpty) {
+      // Find the position_name based on the selected position_id
+      final selectedPosition = Positions.firstWhere(
+            (positionData) => positionData['position_id'] == position,
+        orElse: () => {'position_name': 'Unknown'},  // Fallback to 'Unknown' if not found
+      );
+      positionName = selectedPosition['position_name'];
+    }
     Employee employee = Employee(
       id: '',
       adminId: user?.uid ?? '',
@@ -51,11 +62,11 @@ void saveEmployee() async{
       age: _ageController.text,
       idCard: _idcardController.text,
       reference: _referenceController.text,
-      position: _positionController.text,
       joiningDate: _dateController.text,
       salary: _salaryController.text,
       residence: _residenceController.text,
-      department: department,
+      department: department ?? '',
+      position:  positionName  ?? '',
       employeeStatus: "Active"
     );
 
@@ -68,37 +79,57 @@ void saveEmployee() async{
     _ageController.clear();
     _idcardController.clear();
     _referenceController.clear();
-    _positionController.clear();
     _dateController.clear();
     _salaryController.clear();
     _residenceController.clear();
-    department = "";
+    // Reset department and position
+    setState(() {
+      department = '';
+      position = '';
+    });
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Employee saved successfully")),
     );
   }
 }
 
+
   @override
   void initState() {
     super.initState();
-    // Delay fetchEmployees until after the first frame is built
+    // Fetch positions and set the selected position based on employee data
+    fetchPositions().then((_) {
+      // Once positions are fetched, find the matching position_id for the employee's position_name
+      if (widget.employee != null && widget.employee!.position.isNotEmpty) {
+        final matchingPosition = Positions.firstWhere(
+                (positionData) => positionData['position_name'] == widget.employee!.position,
+            orElse: () => {'position_id': ''}  // Default to empty if not found
+        );
+        setState(() {
+          position = matchingPosition['position_id'];  // Set the position_id for dropdown
+        });
+      }
+    });    // Delay fetchEmployees until after the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<EmployeeProvider>(context, listen: false).fetchEmployees();
     });
-    fetchDepartments();
 
+    fetchDepartments();
 
     _e_nameController = TextEditingController(text: widget.employee?.name);
     _f_nameController = TextEditingController(text: widget.employee?.fatherName);
     _ageController = TextEditingController(text: widget.employee?.age.toString());
     _idcardController = TextEditingController(text: widget.employee?.idCard);
     _referenceController = TextEditingController(text: widget.employee?.reference);
-    _positionController = TextEditingController(text: widget.employee?.position);
+    // _positionController = TextEditingController(text: widget.employee?.position);
     _dateController = TextEditingController(text: widget.employee?.joiningDate);
     _salaryController = TextEditingController(text: widget.employee?.salary.toString());
     _residenceController = TextEditingController(text: widget.employee?.residence);
-  }
+    department = widget.employee?.department ?? '';  // Initialize with empty string if null
+    position = widget.employee?.position ?? '';
+
+}
 
 
   @override
@@ -109,7 +140,7 @@ void saveEmployee() async{
     _ageController.dispose();
     _idcardController.dispose();
     _referenceController.dispose();
-    _positionController.dispose();
+    // _positionController.dispose();
     _dateController.dispose();
     _salaryController.dispose();
     _residenceController.dispose();
@@ -157,6 +188,32 @@ void saveEmployee() async{
     }
   }
 
+  Future<void> fetchPositions() async {
+    print("$Positions");
+    final DatabaseReference _database = FirebaseDatabase.instance.ref();
+
+    // Listen for any changes in the "Employee_position" node
+    _database.child("Employee_position").onValue.listen((event) {
+      final positionsData = event.snapshot;
+      List<Map<String, String>> loadedPositions = [];
+
+      // Loop through the children of positionsData
+      for (var position in positionsData.children) {
+        loadedPositions.add({
+          'position_name': position.child('position_name').value.toString(),
+          'position_id': position.key.toString(),  // Store the key as position_id
+        });
+      }
+
+      // Update state with the loaded positions
+      setState(() {
+        Positions = loadedPositions;  // Assign the loaded positions instead of an empty list
+      });
+
+      print("Positions fetched: $Positions");  // Print fetched positions for debugging
+    });
+  }
+
   String? _validateCNIC(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter your CNIC';
@@ -175,45 +232,6 @@ void saveEmployee() async{
     }
     return null;
   }
-
-
-  // void _showCNICDetails(Map<String, dynamic> data, String type) {
-  //   Consumer<CNICProvider>(
-  //     builder: (context, cnicProvider, child) {
-  //       if (cnicProvider.employeeType != null) {
-  //         // CNIC found
-  //         return AlertDialog(
-  //           title: Text("${cnicProvider.employeeType} Found"),
-  //           content: Column(
-  //             mainAxisSize: MainAxisSize.min,
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text("Name: ${cnicProvider.employeeData?['name']}"),
-  //               Text("Father Name: ${cnicProvider.employeeData?['fatherName']}"),
-  //               Text("Position: ${cnicProvider.employeeData?['position']}"),
-  //               // Add more fields as needed
-  //             ],
-  //           ),
-  //           actions: [
-  //             TextButton(
-  //               onPressed: () {
-  //                 Navigator.of(context).pop();
-  //                 cnicProvider.reset(); // Reset the provider after showing details
-  //               },
-  //               child: const Text("OK"),
-  //             ),
-  //           ],
-  //         );
-  //       } else {
-  //         // CNIC not found or no data available
-  //         return const SizedBox.shrink();
-  //       }
-  //     },
-  //   );
-  // }
-
-
-
 
 
   @override
@@ -383,24 +401,56 @@ void saveEmployee() async{
                                     ),
                                   ),
                                 ),
+                                // Expanded(
+                                //   child: Padding(
+                                //     padding: const EdgeInsets.all(8.0),
+                                //     child: TextFormField(
+                                //       controller: _positionController,
+                                //       decoration: const InputDecoration(
+                                //         hintText: "Enter Employee Position",
+                                //         label: Text("Employee Position"),
+                                //         border: OutlineInputBorder(
+                                //           borderSide: BorderSide(color: Colors.blueAccent,width: 2),
+                                //           borderRadius: BorderRadius.all(Radius.circular(15)),
+                                //         ),
+                                //       ),
+                                //       validator: (value) => _validateNotEmpty(value, 'Employee Position'),
+                                //       textCapitalization: TextCapitalization.words, // This capitalizes the first letter of each word
+                                //     ),
+                                //   ),
+                                // ),
+
                                 Expanded(
-                                  child: Padding(
+                                  child: Positions.isNotEmpty
+                                      ? Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: TextFormField(
-                                      controller: _positionController,
+                                    child: DropdownButtonFormField<String>(
                                       decoration: const InputDecoration(
-                                        hintText: "Enter Employee Position",
-                                        label: Text("Employee Position"),
-                                        border: OutlineInputBorder(
-                                          borderSide: BorderSide(color: Colors.blueAccent,width: 2),
-                                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                                        ),
+                                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+                                        filled: true,
+                                        labelText: "Position",
+                                        labelStyle: TextStyle(fontSize: 15),
                                       ),
-                                      validator: (value) => _validateNotEmpty(value, 'Employee Position'),
-                                      textCapitalization: TextCapitalization.words, // This capitalizes the first letter of each word
-                                    ),
-                                  ),
+                                      value: position != '' ? position : null,
+                                      items: Positions.map((positionData) {
+                                        return DropdownMenuItem<String>(
+                                          value: positionData['position_id'],  // Make sure this matches with `position`
+                                          child: Text(positionData['position_name']!),  // Display the name
+                                        );
+                                      }).toList(),
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          position = newValue;  // Update the selected position
+                                        });
+                                      },
+                                      validator: (value) => value == null || value.isEmpty ? 'Select a position' : null,
+                                    )
+
+
+                                  )
+                                      : const Center(child: CircularProgressIndicator()), // Show loader when Positions are empty
                                 ),
+
                               ],
                             ),
                             Row(
@@ -477,7 +527,8 @@ void saveEmployee() async{
                                         labelText: "Department",
                                         labelStyle: TextStyle(fontSize: 15),),
                                           validator: (value) => _validateNotEmpty(value, 'Employee Department'),
-                                          value: department.isEmpty ? null : department,
+                                          // value: department!.isEmpty ? null : department,
+                                          value: department != '' ? department : null,  // If department is an empty string, set value to null
                                           items: Departments.map((String value) {
                                         return DropdownMenuItem<String>(
                                           value: value,
@@ -564,6 +615,15 @@ void saveEmployee() async{
   }
   void updateEmployee() {
     if (formKey.currentState!.validate()) {
+      String? positionName;
+      if (position != null && Positions.isNotEmpty) {
+        // Find the position_name based on the selected position_id
+        final selectedPosition = Positions.firstWhere(
+              (positionData) => positionData['position_id'] == position,
+          orElse: () => {'position_name': 'Unknown'},  // Fallback to 'Unknown' if not found
+        );
+        positionName = selectedPosition['position_name'];
+      }
       // Create an updated Employee object
       Employee updatedEmployee = Employee(
         id: widget.employee!.id,
@@ -574,11 +634,12 @@ void saveEmployee() async{
         age: _ageController.text,
         idCard: _idcardController.text,
         reference: _referenceController.text,
-        position: _positionController.text,
+        // position: _positionController.text,
         joiningDate: _dateController.text,
         salary: _salaryController.text,
         residence: _residenceController.text,
-        department: department,
+        department: department ?? '',
+        position:  positionName ?? '',
         employeeStatus: "Active",
       );
 

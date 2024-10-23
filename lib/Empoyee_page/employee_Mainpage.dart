@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:salary_soft/Empoyee_page/add_employee.dart';
 import 'package:salary_soft/Empoyee_page/total_Employee.dart';
+import 'package:salary_soft/Empoyee_page/total_positions.dart';
 
 import '../Models/employeemodel.dart';
 import 'employee_expenses.dart';
+import 'employee_position.dart';
 
 class employee_dashBoard extends StatefulWidget {
   const employee_dashBoard({super.key});
@@ -21,12 +23,14 @@ class _employee_dashBoardState extends State<employee_dashBoard> {
   List<Employee> _employees = [];
   List<Employee> get employees => _employees;
   int _resticatedEmployeeCount = 0; // Add this variable to track the count of Resticated employees
+  int _totalPositionsCount = 0; // Variable to track the total positions count
 
  @override
   void initState() {
     super.initState();
     fetchEmployees();
     fetchresticatedEmployees(); // Fetch Resticated employees
+    fetchTotalPositions(); // Fetch Total Positions
 
  }
 
@@ -84,6 +88,21 @@ class _employee_dashBoardState extends State<employee_dashBoard> {
       });
     });
   }
+
+  Future<void> fetchTotalPositions() async {
+    _database.child("Employee_position").onValue.listen((event) {
+      final positionsData = event.snapshot;
+      int positionsCount = 0;
+
+      // Count the total number of positions
+      positionsCount = positionsData.children.length;
+
+      setState(() {
+        _totalPositionsCount = positionsCount; // Update the total positions count
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +171,18 @@ class _employee_dashBoardState extends State<employee_dashBoard> {
                     },
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DashboardCard(
+                    title: "Employees Positions",
+                    icon: Icons.add,
+                    count: _totalPositionsCount.toString(), // Show total positions count here
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const TotalPositions()));
+                    },
+                  ),
+                ),
+
 
               ],
             ),
