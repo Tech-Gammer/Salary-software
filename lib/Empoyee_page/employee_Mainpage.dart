@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:salary_soft/Empoyee_page/add_employee.dart';
 import 'package:salary_soft/Empoyee_page/total_Employee.dart';
+import 'package:salary_soft/Empoyee_page/total_expenses.dart';
 import 'package:salary_soft/Empoyee_page/total_positions.dart';
 
 import '../Models/employeemodel.dart';
@@ -179,6 +180,20 @@ class _employee_dashBoardState extends State<employee_dashBoard> {
                     count: _totalPositionsCount.toString(), // Show total positions count here
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const TotalPositions()));
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DashboardCard(
+                    title: "Employees Expenses",
+                    icon: Icons.add,
+                    count: _totalPositionsCount.toString(), // Show total positions count here
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ExpensesListPage()),
+                      );
                     },
                   ),
                 ),

@@ -12,6 +12,10 @@ class EmployeeProvider with ChangeNotifier {
   List<Employee> get employees => _employees;
   List<Employee> resticatedEmployees = []; // List for resticated employees
 
+  List<Expense> _expenses = []; // List to store all expenses
+
+  // Add a getter for expenses
+  List<Expense> get expenses => _expenses;
 
   Future<void> saveEmployee(Employee employee) async {
     // Get the current user's ID
@@ -257,6 +261,30 @@ class EmployeeProvider with ChangeNotifier {
 
 
 
+  // Fetch all expenses from Firebase
+  Future<void> fetchAllExpenses() async {
+    try {
+      final DataSnapshot snapshot = await _database.child("expenses").get();
+      List<Expense> loadedExpenses = [];
+
+      for (var exp in snapshot.children) {
+        final expense = Expense(
+          expenseId: exp.key!, // Use the key as the id
+          employeeId: exp.child('employeeId').value.toString(),
+          type: exp.child('type').value.toString(),
+          amount: exp.child('amount').value.toString(),
+          description: exp.child('description').value.toString(),
+          date: exp.child('date').value.toString(),
+        );
+        loadedExpenses.add(expense);
+      }
+
+      _expenses = loadedExpenses;
+      notifyListeners(); // Notify listeners to rebuild the UI
+    } catch (e) {
+      print("Error fetching expenses: $e");
+    }
+  }
 
 
 }

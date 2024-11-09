@@ -42,6 +42,10 @@ dependencies:
   provider: ^6.1.2
   dropdown_search: ^6.0.1
   intl: ^0.19.0
+  printing: ^5.5.0
+  pdf: ^3.11.0
+
+
 
 
 dev_dependencies:
@@ -81,6 +85,25 @@ flutter:
         - family: JameelNoori
           fonts:
             - asset: assets/fonts/JameelNooriNastaleeq.ttf
+        - family: NotoNastaliqUrdu
+          fonts:
+                - asset: assets/fonts/NotoNastaliqUrdu-Regular.ttf
+#  assets:
+#    - images/
+#    - assets/fonts/
+#
+#  fonts:
+#      - family: Lora
+#        fonts:
+#          - asset: assets/fonts/Lora-Italic-VariableFont_wght.ttf
+#          - asset: assets/fonts/Lora-VariableFont_wght.ttf
+#      - family: JameelNoori
+#        fonts:
+#          - asset: assets/fonts/JameelNooriNastaleeq.ttf
+#      - family: NotoNastaliqUrdu
+#        fonts:
+#          - asset: assets/fonts/NotoNastaliqUrdu-Regular.ttf
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

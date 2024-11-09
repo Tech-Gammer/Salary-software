@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -177,11 +178,55 @@ class _EmployeeExpensesState extends State<EmployeeExpenses> {
               const SizedBox(height: 16.0),
 
               // Submit button
+              // ElevatedButton(
+              //   onPressed: () {
+              //     if (_formKey.currentState!.validate()) {
+              //       // Create the Expense object
+              //       Expense expense = Expense(
+              //         expenseId: ,
+              //         employeeId: _selectedEmployee!,
+              //         type: _selectedExpenseType!,
+              //         amount: _amount,
+              //         description: _description,
+              //         date: DateTime.now().toIso8601String(), // Current date
+              //       );
+              //
+              //       // Call saveExpense method from the provider to save expense to Firebase
+              //       expenseProvider.saveExpense(expense).then((_) {
+              //         // Clear the form after submission
+              //         _formKey.currentState!.reset();
+              //         setState(() {
+              //           _selectedExpenseType = null;
+              //           _selectedDepartment = null; // Reset department selection
+              //           _selectedEmployee = null;
+              //           _amount = '';
+              //           _description = '';
+              //         });
+              //
+              //         // Show confirmation dialog or message
+              //         ScaffoldMessenger.of(context).showSnackBar(
+              //           SnackBar(content: Text('Expense added successfully!')),
+              //         );
+              //       }).catchError((error) {
+              //         // Handle error if saving fails
+              //         ScaffoldMessenger.of(context).showSnackBar(
+              //           SnackBar(content: Text('Failed to add expense: $error')),
+              //         );
+              //       });
+              //     }
+              //   },
+              //   child: const Text('Add Expense'),
+              // ),
+
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Create the Expense object
+                    // Generate a unique expenseId
+                    String expenseId = FirebaseDatabase.instance.ref().child("expenses").push().key!;
+
+                    // Create the Expense object with the generated expenseId
                     Expense expense = Expense(
+                      expenseId: expenseId, // Set the expenseId here
                       employeeId: _selectedEmployee!,
                       type: _selectedExpenseType!,
                       amount: _amount,
@@ -203,7 +248,7 @@ class _EmployeeExpensesState extends State<EmployeeExpenses> {
 
                       // Show confirmation dialog or message
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Expense added successfully!')),
+                        const SnackBar(content: Text('Expense added successfully!')),
                       );
                     }).catchError((error) {
                       // Handle error if saving fails
@@ -215,6 +260,7 @@ class _EmployeeExpensesState extends State<EmployeeExpenses> {
                 },
                 child: const Text('Add Expense'),
               ),
+
             ],
           ),
         ),
